@@ -1,9 +1,23 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class GridManager : MonoBehaviour
 {
     public GameObject cellPrefab;
+    public TouchControl touchControl;
+    public Text scoreNum;
+    private int _score = 0;
+    private int score {
+        get {
+            return _score;
+        }
+        set {
+            _score = value;
+            scoreNum.text = _score.ToString();
+        }
+    }
     public Cell[,] cells = new Cell[4, 4];
     List<Cell> nullCells = new List<Cell>();
     void Start() {
@@ -11,17 +25,21 @@ public class GridManager : MonoBehaviour
     }
 
     void Update() {
-        if(Input.GetKeyDown(KeyCode.UpArrow)) {
-            Move(Global.Direction.UP);
+        if(Input.GetKeyDown(KeyCode.UpArrow) || touchControl.direction == MoveDirection.Up) {
+            Move(MoveDirection.Up);
+            touchControl.direction = MoveDirection.None;
         }
-        else if(Input.GetKeyDown(KeyCode.DownArrow)) {
-            Move(Global.Direction.DOWN);
+        else if(Input.GetKeyDown(KeyCode.DownArrow) || touchControl.direction == MoveDirection.Down) {
+            Move(MoveDirection.Down);
+            touchControl.direction = MoveDirection.None;
         }
-        else if(Input.GetKeyDown(KeyCode.LeftArrow)) {
-            Move(Global.Direction.LEFT);
+        else if(Input.GetKeyDown(KeyCode.LeftArrow) || touchControl.direction == MoveDirection.Left) {
+            Move(MoveDirection.Left);
+            touchControl.direction = MoveDirection.None;
         }
-        else if(Input.GetKeyDown(KeyCode.RightArrow)) {
-            Move(Global.Direction.RIGHT);
+        else if(Input.GetKeyDown(KeyCode.RightArrow) || touchControl.direction == MoveDirection.Right) {
+            Move(MoveDirection.Right);
+            touchControl.direction = MoveDirection.None;
         }
     }
 
@@ -62,9 +80,9 @@ public class GridManager : MonoBehaviour
         nullCells.Add(cells[_x, _y]);
     }
 
-    void Move(Global.Direction _dir) {
+    void Move(MoveDirection _dir) {
         switch(_dir) {
-            case Global.Direction.UP:
+            case MoveDirection.Up:
                 for(int y = 1; y < 4; y++) {
                     for(int x = 0; x < 4; x++) {
                         if(cells[x, y].cellValue == 0) {
@@ -80,6 +98,7 @@ public class GridManager : MonoBehaviour
                             else {
                                 if(cells[x, tmpy].cellValue == cells[x, tmpy + 1].cellValue) {
                                     cells[x, tmpy].cellValue *= 2;
+                                    score += 2;
                                     SetNullCell(x, tmpy + 1);
                                 }
                                 break;
@@ -90,7 +109,7 @@ public class GridManager : MonoBehaviour
                     }
                 }
                 break;
-            case Global.Direction.DOWN:
+            case MoveDirection.Down:
                 for(int y = 2; y >= 0; y--) {
                     for(int x = 0; x < 4; x++) {
                         if(cells[x, y].cellValue == 0) {
@@ -106,6 +125,7 @@ public class GridManager : MonoBehaviour
                             else {
                                 if(cells[x, tmpy].cellValue == cells[x, tmpy - 1].cellValue) {
                                     cells[x, tmpy].cellValue *= 2;
+                                    score += 2;
                                     SetNullCell(x, tmpy - 1);
                                 }
                                 break;
@@ -116,7 +136,7 @@ public class GridManager : MonoBehaviour
                     }
                 }
                 break;
-            case Global.Direction.LEFT:
+            case MoveDirection.Left:
                 for(int x = 1; x < 4; x++) {
                     for(int y = 0; y < 4; y++) {
                         if(cells[x, y].cellValue == 0) {
@@ -132,6 +152,7 @@ public class GridManager : MonoBehaviour
                             else {
                                 if(cells[tmpx, y].cellValue == cells[tmpx + 1, y].cellValue) {
                                     cells[tmpx, y].cellValue *= 2;
+                                    score += 2;
                                     SetNullCell(tmpx + 1, y);
                                 }
                                 break;
@@ -142,7 +163,7 @@ public class GridManager : MonoBehaviour
                     }
                 }
                 break;
-            case Global.Direction.RIGHT:
+            case MoveDirection.Right:
                 for(int x = 2; x >= 0; x--) {
                     for(int y = 0; y < 4; y++) {
                         if(cells[x, y].cellValue == 0) {
@@ -160,6 +181,7 @@ public class GridManager : MonoBehaviour
                             else {
                                 if(cells[tmpx, y].cellValue == cells[tmpx - 1, y].cellValue) {
                                     cells[tmpx, y].cellValue *= 2;
+                                    score += 2;
                                     SetNullCell(tmpx - 1, y);
                                 }
                                 break;
